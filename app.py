@@ -1,1 +1,1 @@
-st.write("Test")
+print("Hello world")
