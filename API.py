@@ -27,7 +27,13 @@ def start_oauth():
 def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        token = linkedin.fetch_token(TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
+        # Include the client_id in the token request body explicitly
+        token = linkedin.fetch_token(
+            TOKEN_URL, 
+            client_secret=CLIENT_SECRET, 
+            code=code,
+            include_client_id=True
+        )
         # Save the token in session
         st.session_state['oauth_token'] = token
 
@@ -39,6 +45,9 @@ def fetch_token_and_user_info(code):
         email_info = linkedin.get('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))').json()
         st.session_state['email_info'] = email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', '')
         
+        # If all goes well, display success message
+        st.success("Authentication successful!")
+
     except HTTPError as e:
         st.error(f'An HTTP error occurred: {e.response.status_code}')
     except Exception as e:
@@ -56,9 +65,8 @@ def main():
             start_oauth()
         else:
             fetch_token_and_user_info(code[0])
-            st.success("Authentication successful!")
 
-    if "user_info" in st.session_state:
+    if "user_info" in st.session_state and "email_info" in st.session_state:
         st.write("Your LinkedIn profile information:")
         st.json(st.session_state['user_info'])
 
