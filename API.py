@@ -8,7 +8,7 @@ CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://cz5daz6qukdskgv9cj6h4t.streamlit.app/'  # Your Streamlit app's address
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-SCOPE = ['openid','profile','email']  # Scopes for OpenID Connect
+SCOPE = ['r_liteprofile', 'r_emailaddress', 'w_member_social']  # Scopes for OpenID Connect
 
 # Function to parse query string
 def get_query_params():
