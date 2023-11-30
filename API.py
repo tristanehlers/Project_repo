@@ -27,7 +27,7 @@ def start_oauth():
     st.session_state['oauth_state'] = state
 
     # Redirect to LinkedIn for authorization
-    st.markdown(f"[Log in with LinkedIn]({authorization_url})", unsafe_allow_html=True)
+    st.markdown(f"[Log in with LinkedIn to prefill your CV]({authorization_url})", unsafe_allow_html=True)
 
 # Fetch token
 def fetch_token(code):
