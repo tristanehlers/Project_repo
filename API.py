@@ -8,8 +8,7 @@ CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://cz5daz6qukdskgv9cj6h4t.streamlit.app/'  # Your Streamlit app's address
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-# Updated scopes to match LinkedIn's expectations
-SCOPE = ['r_emailaddress', 'r_liteprofile']  # Scopes for OpenID Connect
+SCOPE = ['openid', 'profile', 'email']  # Scopes for OpenID Connect
 
 # Function to parse query string
 def get_query_params():
@@ -28,6 +27,7 @@ def start_oauth():
 def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        # Include the client_id in the token request body explicitly
         token = linkedin.fetch_token(
             TOKEN_URL, 
             client_secret=CLIENT_SECRET, 
