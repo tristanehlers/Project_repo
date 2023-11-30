@@ -7,7 +7,7 @@ import jwt
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
-REDIRECT_URI = 'https://cz5daz6qukdskgv9cj6h4t.streamlit.app/'  # Your Streamlit app's address
+REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Your Streamlit app's address
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
 SCOPE = ['r_liteprofile', 'r_emailaddress']  # Scopes for OpenID Connect
