@@ -1,1 +1,5 @@
+streamlit
+requests
+requests_oauthlib
+oauthlib
 
