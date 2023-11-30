@@ -2,7 +2,7 @@ import streamlit as st
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
 
-# Constantsj
+# Constants
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://cz5daz6qukdskgv9cj6h4t.streamlit.app/'  # Your Streamlit app's address
