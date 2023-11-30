@@ -48,7 +48,7 @@ def fetch_profile_info(token):
 
 # Main App
 def main():
-    st.title("LinkedIn Profile Information")
+    st.title("Retrieve your LinkedIn Profile Information")
 
     # Check if the code is returned in the query string
     query_params = get_query_params()
