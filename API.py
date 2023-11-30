@@ -33,7 +33,7 @@ def fetch_token_and_user_info(code):
         st.session_state['oauth_token'] = token
 
         # Fetch user info
-        user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
+        user_info = linkedin.get('https://api.linkedin.com/v2/userinfo').json()
         st.session_state['user_info'] = user_info
 
         # Fetch user email
