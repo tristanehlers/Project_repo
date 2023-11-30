@@ -1,8 +1,6 @@
 import streamlit as st
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
-from jwt import PyJWKClient
-import jwt
 
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
