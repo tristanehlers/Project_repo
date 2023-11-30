@@ -2,7 +2,7 @@ import streamlit as st
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
 
-# Constants
+# Constantsj
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://cz5daz6qukdskgv9cj6h4t.streamlit.app/'  # Your Streamlit app's address
@@ -33,7 +33,7 @@ def fetch_token_and_user_info(code):
         st.session_state['oauth_token'] = token
 
         # Fetch user info
-        user_info = linkedin.get('https://api.linkedin.com/v2/userinfo').json()
+        user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
         st.session_state['user_info'] = user_info
 
         # Fetch user email
