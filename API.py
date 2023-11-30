@@ -28,7 +28,7 @@ def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
         # Add the client_secret parameter to the fetch_token() method call
-        token = linkedin.fetch_token(TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
+        token = linkedin.fetch_token(TOKEN_URL, client_secret='4ZwcgJ0s0ENgcVuA', code=code)
         # Save the token in session
         st.session_state['oauth_token'] = token
 
