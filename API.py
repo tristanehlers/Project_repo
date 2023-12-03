@@ -29,22 +29,20 @@ def fetch_token_and_user_info(code):
         # Fetch the token using the authorization code
         token = linkedin.fetch_token(
             TOKEN_URL,
-            authorization_response=st.session_state['authorization_response'],
-            # Pass client_secret here
             client_secret=CLIENT_SECRET,
             code=code
         )
         st.session_state['oauth_token'] = token
 
         user_info = linkedin.get('https://api.linkedin.com/v2/me', headers={
-            'Authorization': f'Bearer {st.session_state["oauth_token"]["access_token"]}'
+            'Authorization': f'Bearer {token["access_token"]}'
         }).json()
         st.session_state['user_info'] = user_info
 
         email_info = linkedin.get(
             'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))', 
             headers={
-                'Authorization': f'Bearer {st.session_state["oauth_token"]["access_token"]}'
+                'Authorization': f'Bearer {token["access_token"]}'
             }
         ).json()
         st.session_state['email_info'] = email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', '')
@@ -67,8 +65,8 @@ def main():
         if not code:
             start_oauth()
         else:
-            # Save the full authorization response URL
-            st.session_state['authorization_response'] = st.url
+            # The code below is modified to avoid the AttributeError for st.url
+            # Since we're not using st.url, we don't need to store anything in st.session_state['authorization_response']
             fetch_token_and_user_info(code)
             st.success("Authentication successful!")
 
