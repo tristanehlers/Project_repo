@@ -34,6 +34,9 @@ def fetch_token_and_user_info(code):
         )
         st.session_state['oauth_token'] = token
 
+        # Display the token on the Streamlit app for debugging purposes
+        st.write("Received token:", token)  # Add this line to display the token
+
         user_info = linkedin.get('https://api.linkedin.com/v2/me', headers={
             'Authorization': f'Bearer {token["access_token"]}'
         }).json()
