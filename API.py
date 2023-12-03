@@ -5,7 +5,7 @@ from requests.exceptions import HTTPError
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
-REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
+REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Ensure this is consistent with LinkedIn app settings
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
 SCOPE = 'openid', 'profile', 'email'
@@ -26,13 +26,13 @@ def start_oauth():
 def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        st.write("Received authorization code:", code)  # Debug print
+        # Include the redirect_uri in the token request for consistency
         token = linkedin.fetch_token(
             TOKEN_URL,
-            include_client_id=True,  # Include the client_id in the token request
-            client_id=CLIENT_ID,     # Include the client_id explicitly
-            client_secret=CLIENT_SECRET,  # Include the client_secret explicitly
-            code=code
+            client_secret=CLIENT_SECRET,
+            code=code,
+            include_client_id=True,  # Explicitly include the client_id in the token request
+            redirect_uri=REDIRECT_URI  # Ensure this matches the original authorization request
         )
         # Save the token in session
         st.session_state['oauth_token'] = token
@@ -63,12 +63,9 @@ def main():
         if not code:
             start_oauth()
         else:
-            # Extra check to make sure the code looks valid
-            if len(code) > 10:  # Usually, an auth code is a long string, not just one character
-                fetch_token_and_user_info(code)
-                st.success("Authentication successful!")
-            else:
-                st.error("The authorization code seems too short. Please try authenticating again.")
+            # Ensure the code is processed immediately to avoid expiration
+            fetch_token_and_user_info(code)
+            st.success("Authentication successful!")
 
     if "user_info" in st.session_state:
         st.write("Your LinkedIn profile information:")
