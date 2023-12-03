@@ -5,38 +5,33 @@ from requests.exceptions import HTTPError
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
-REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Your Streamlit app's address
+REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Ensure this matches the LinkedIn application settings
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-SCOPE = ['openid', 'profile', 'email']  # Scopes for OpenID Connect
+SCOPE = 'openid profile email'  # Space-delimited string
 
 # Function to parse query string
 def get_query_params():
-    return st.experimental_get_query_params()
+    params = st.experimental_get_query_params()
+    return {k: v[0] for k, v in params.items()}
 
 # Start the OAuth process
 def start_oauth():
     linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
     authorization_url, state = linkedin.authorization_url(AUTHORIZATION_BASE_URL)
-    # Save the state in session for later use
     st.session_state['oauth_state'] = state
-    # Redirect to LinkedIn for authorization
     st.markdown(f"[Log in with LinkedIn]({authorization_url})", unsafe_allow_html=True)
 
 # Fetch token and user info
 def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        # Add the client_secret parameter to the fetch_token() method call
-        token = linkedin.fetch_token(TOKEN_URL, client_secret='4ZwcgJ0s0ENgcVuA', code=code)
-        # Save the token in session
+        token = linkedin.fetch_token(TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
         st.session_state['oauth_token'] = token
 
-        # Fetch user info
         user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
         st.session_state['user_info'] = user_info
 
-        # Fetch user email
         email_info = linkedin.get('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))').json()
         st.session_state['email_info'] = email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', '')
 
@@ -56,7 +51,7 @@ def main():
         if not code:
             start_oauth()
         else:
-            fetch_token_and_user_info(code[0])
+            fetch_token_and_user_info(code)
             st.success("Authentication successful!")
 
     if "user_info" in st.session_state:
