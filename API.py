@@ -1,6 +1,8 @@
 import streamlit as st
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
+import urllib.parse as urlparse
+from urllib.parse import parse_qs
 
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
@@ -10,9 +12,11 @@ AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
 SCOPE = ['openid', 'profile', 'email']  # Scopes for OpenID Connect
 
-# Function to parse query string
-def get_query_params():
-    return st.experimental_get_query_params()
+# Custom function to parse query string
+def get_query_params(url):
+    parsed_url = urlparse.urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    return {k: v[0] for k, v in query_params.items()}
 
 # Start the OAuth process
 def start_oauth():
@@ -28,7 +32,7 @@ def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
         # Add the client_secret parameter to the fetch_token() method call
-        token = linkedin.fetch_token(TOKEN_URL, client_secret='4ZwcgJ0s0ENgcVuA', code=code)
+        token = linkedin.fetch_token(TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
         # Save the token in session
         st.session_state['oauth_token'] = token
 
@@ -49,14 +53,16 @@ def fetch_token_and_user_info(code):
 def main():
     st.title("LinkedIn OpenID Connect Authentication")
 
-    query_params = get_query_params()
+    # Get the current URL from Streamlit's query parameters
+    current_url = st.experimental_get_query_params()
+    query_params = get_query_params(str(current_url))
     code = query_params.get("code")
 
     if "oauth_token" not in st.session_state:
         if not code:
             start_oauth()
         else:
-            fetch_token_and_user_info(code[0])
+            fetch_token_and_user_info(code)
             st.success("Authentication successful!")
 
     if "user_info" in st.session_state:
