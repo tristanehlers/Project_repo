@@ -8,7 +8,7 @@ CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-SCOPE = 'openid', 'profile', 'email'
+SCOPE = 'openid profile email'
 
 # Function to parse query string
 def get_query_params():
@@ -25,19 +25,27 @@ def start_oauth():
 # Fetch token and user info
 def fetch_token_and_user_info(code):
     try:
-        linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI)
+        # Fetch the token using the authorization code
         token = linkedin.fetch_token(
             TOKEN_URL,
+            authorization_response=st.session_state['authorization_response'],
+            # Pass client_secret here
             client_secret=CLIENT_SECRET,
             code=code
         )
         st.session_state['oauth_token'] = token
 
-        user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
+        user_info = linkedin.get('https://api.linkedin.com/v2/me', headers={
+            'Authorization': f'Bearer {st.session_state["oauth_token"]["access_token"]}'
+        }).json()
         st.session_state['user_info'] = user_info
 
         email_info = linkedin.get(
-            'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))'
+            'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))', 
+            headers={
+                'Authorization': f'Bearer {st.session_state["oauth_token"]["access_token"]}'
+            }
         ).json()
         st.session_state['email_info'] = email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', '')
 
@@ -59,6 +67,8 @@ def main():
         if not code:
             start_oauth()
         else:
+            # Save the full authorization response URL
+            st.session_state['authorization_response'] = st.url
             fetch_token_and_user_info(code)
             st.success("Authentication successful!")
 
