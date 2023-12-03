@@ -29,10 +29,12 @@ def fetch_token_and_user_info(code):
         st.write("Received authorization code:", code)  # Debug print
         token = linkedin.fetch_token(
             TOKEN_URL,
-            client_secret=CLIENT_SECRET,
-            code=code,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            include_client_id=True,  # Include the client_id in the token request
+            client_id=CLIENT_ID,     # Include the client_id explicitly
+            client_secret=CLIENT_SECRET,  # Include the client_secret explicitly
+            code=code
         )
+        # Save the token in session
         st.session_state['oauth_token'] = token
 
         user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
