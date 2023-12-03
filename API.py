@@ -5,7 +5,7 @@ from requests.exceptions import HTTPError
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
-REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Your Streamlit app's address
+REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Ensure this matches exactly with the LinkedIn application settings
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
 SCOPE = 'openid profile email'  # Scopes for OpenID Connect
@@ -28,7 +28,15 @@ def start_oauth():
 def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        token = linkedin.fetch_token(TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
+        # Print the authorization code for debugging
+        st.write("Received authorization code:", code)
+        # Fetch the token using the authorization code
+        token = linkedin.fetch_token(
+            TOKEN_URL,
+            client_secret=CLIENT_SECRET,
+            code=code,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
         # Save the token in session
         st.session_state['oauth_token'] = token
 
@@ -37,13 +45,19 @@ def fetch_token_and_user_info(code):
         st.session_state['user_info'] = user_info
 
         # Fetch user email
-        email_info = linkedin.get('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))').json()
+        email_info = linkedin.get(
+            'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))'
+        ).json()
         st.session_state['email_info'] = email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', '')
 
     except HTTPError as e:
         st.error(f'An HTTP error occurred: {e.response.status_code}')
+        # Print the full error response for debugging
+        st.write(e.response.text)
     except Exception as e:
         st.error(f'An error occurred: {e}')
+        # Print the exception message for debugging
+        st.write(str(e))
 
 # Main App
 def main():
