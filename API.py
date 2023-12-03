@@ -5,7 +5,7 @@ from requests.exceptions import HTTPError
 # Constants
 CLIENT_ID = '785jejrypgi7ks'
 CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
-REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Ensure this is consistent with LinkedIn app settings
+REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
 SCOPE = 'openid', 'profile', 'email'
@@ -26,15 +26,11 @@ def start_oauth():
 def fetch_token_and_user_info(code):
     try:
         linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        # Include the redirect_uri in the token request for consistency
         token = linkedin.fetch_token(
             TOKEN_URL,
             client_secret=CLIENT_SECRET,
-            code=code,
-            include_client_id=True,  # Explicitly include the client_id in the token request
-            redirect_uri=REDIRECT_URI  # Ensure this matches the original authorization request
+            code=code
         )
-        # Save the token in session
         st.session_state['oauth_token'] = token
 
         user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
@@ -47,10 +43,10 @@ def fetch_token_and_user_info(code):
 
     except HTTPError as e:
         st.error(f'An HTTP error occurred: {e.response.status_code}')
-        st.write(e.response.text)  # Debug print
+        st.write(e.response.text)
     except Exception as e:
         st.error(f'An error occurred: {e}')
-        st.write(str(e))  # Debug print
+        st.write(str(e))
 
 # Main App
 def main():
@@ -63,7 +59,6 @@ def main():
         if not code:
             start_oauth()
         else:
-            # Ensure the code is processed immediately to avoid expiration
             fetch_token_and_user_info(code)
             st.success("Authentication successful!")
 
