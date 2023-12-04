@@ -24,17 +24,24 @@ st.write('Please go to this URL and authorize:', authorization_url)
 redirect_response = st.text_input('Paste the callback URL here: ')
 
 if redirect_response:
-    # Retrieve the state from the session
-    state = st.session_state['oauth_state']
-    # Exchange authorization code for access token
-    token = oauth.fetch_token(token_url, client_secret=client_secret, 
-                              authorization_response=redirect_response,
-                              state=state)
+    try:
+        # Retrieve the state from the session
+        state = st.session_state.get('oauth_state', '')
+        # Exchange authorization code for access token
+        token = oauth.fetch_token(token_url, client_secret=client_secret, 
+                                  authorization_response=redirect_response,
+                                  state=state)
 
-    # Use token to make LinkedIn API calls
-    linkedin = OAuth2Session(client_id, token=token)
-    # Fetch the user's profile data
-    response = linkedin.get('https://api.linkedin.com/v2/me')
+        # Output the token to the Streamlit app (for debugging purposes)
+        st.write("Access token:", token)
 
-    # Display user profile data in Streamlit
-    st.json(response.json())
+        # Use token to make LinkedIn API calls
+        linkedin = OAuth2Session(client_id, token=token)
+        # Fetch the user's profile data
+        response = linkedin.get('https://api.linkedin.com/v2/me')
+
+        # Display user profile data in Streamlit
+        st.json(response.json())
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
