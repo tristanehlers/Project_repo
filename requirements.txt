@@ -1,2 +1,2 @@
-areerjet-api-client
+areerjet_api_client
 streamlit
