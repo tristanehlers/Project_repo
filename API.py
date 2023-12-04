@@ -8,7 +8,7 @@ CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-SCOPE = 'openid', 'profile', 'email'  # Make sure this scope is correctly set in your LinkedIn app
+SCOPE = 'openid profile email'  # Make sure this scope is correctly set in your LinkedIn app
 
 # Function to initiate OAuth process and handle token retrieval
 def handle_oauth():
