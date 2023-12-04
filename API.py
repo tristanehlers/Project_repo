@@ -30,7 +30,7 @@ if redirect_response:
     # Use token to make LinkedIn API calls
     linkedin = OAuth2Session(client_id, token=token)
     # Make sure to include the access token in the header
-    response = linkedin.get('https://api.linkedin.com/v2/me', headers={'Authorization': f'Bearer {token["access_token"]}'})
+    response = linkedin.get('https://api.linkedin.com/v2/userinfo', headers={'Authorization': f'Bearer {token["access_token"]}'})
     
     # Check if the response was successful
     if response.status_code == 200:
