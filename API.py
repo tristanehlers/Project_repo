@@ -60,7 +60,6 @@ def fetch_token_and_user_info(code):
 # Main App
 def main():
     st.title("LinkedIn OpenID Connect Authentication")
-    st.text(token_url)
 
     query_params = get_query_params()
     code = query_params.get("code")
