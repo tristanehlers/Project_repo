@@ -1,6 +1,3 @@
-streamlit
 requests
 requests_oauthlib
-oauthlib
-streamlit-oauth
 oauthlib.oauth2
