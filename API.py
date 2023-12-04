@@ -2,8 +2,8 @@ import streamlit as st
 from requests_oauthlib import OAuth2Session
 
 # Your LinkedIn credentials
-client_id = '785jejrypgi7ks'
-client_secret = '4ZwcgJ0s0ENgcVuA'
+client_id = '78nz3x6cxyj37h'
+client_secret = 'UofXEjpk0jez4CfI'
 
 # OAuth endpoints given in the LinkedIn API documentation
 authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
