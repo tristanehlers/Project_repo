@@ -11,12 +11,14 @@ authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
 token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
 redirect_uri = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 
-# Initialize OAuth2 session
-oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=['openid profile email'])
+# Initialize OAuth2 session with the correct scopes
+oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=['r_liteprofile', 'r_emailaddress'])
+
+# Generate the authorization URL
 authorization_url, state = oauth.authorization_url(authorization_base_url)
 
 # Streamlit app to display authorization URL
-st.write(f'Please go to this URL and authorize: {authorization_url}')
+st.write('Please go to this URL and authorize:', authorization_url)
 
 # Streamlit input for the callback URL
 redirect_response = st.text_input('Paste the callback URL here: ')
@@ -27,7 +29,12 @@ if redirect_response:
 
     # Use token to make LinkedIn API calls
     linkedin = OAuth2Session(client_id, token=token)
-    response = linkedin.get('https://api.linkedin.com/v2/userinfo')
-
-    # Display user profile data in Streamlit
-    st.json(response.json())
+    # Make sure to include the access token in the header
+    response = linkedin.get('https://api.linkedin.com/v2/me', headers={'Authorization': f'Bearer {token["access_token"]}'})
+    
+    # Check if the response was successful
+    if response.status_code == 200:
+        # Display user profile data in Streamlit
+        st.json(response.json())
+    else:
+        st.error('Failed to retrieve data from LinkedIn API')
