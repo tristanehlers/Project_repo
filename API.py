@@ -1,47 +1,24 @@
-from setuptools import setup
-
-setup(name='careerjet_api_client',
-      version='3.0.1',
-      description='Python interface to Careerjet\'s public search API',
-      url='http://github.com/careerjet/careerjet-api-client-python',
-      author='Careerjet',
-      #author_email='',
-      license='MIT',
-      packages=['careerjet_api_client'],
-      install_requires=['requests'],
-      zip_safe=False)
-
 import streamlit as st
-from careerjet_api_client import CareerjetAPIClient
+from streamlit_server_state import server_state, server_state_access
 
-def search_jobs(location, keyword):
-    cj  = CareerjetAPIClient("en_GB")  # Use the appropriate locale here
+@server_state_access
+def get_client_ip():
+    if server_state.client_ip is None:
+        raise ValueError("Client IP is not set on the server state!")
+    return server_state.client_ip
 
-    result = cj.search({
-        'location'    : location,
-        'keywords'    : keyword,
-        'affid'       : 'your_affiliate_id',  # Replace with your affiliate ID
-        'user_ip'     : '11.22.33.44',        # Replace with the user's IP
-        'url'         : 'http://www.example.com/jobsearch', # Replace with your URL
-        'pagesize'    : 10,
-    })
+# Somewhere in your server initialization code
+# This is pseudo-code and would need to be adapted to your specific server setup
+@server.route("/streamlit_app")
+def streamlit_app_route():
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    server_state.client_ip = client_ip
+    return render_streamlit_app()
 
-    return result['jobs']
-
-# Streamlit UI
-st.title("Job Search with Careerjet")
-
-location = st.text_input("Location")
-keyword = st.text_input("Keyword")
-
-if st.button("Search"):
-    if location and keyword:
-        jobs = search_jobs(location, keyword)
-        for job in jobs:
-            st.write(job['title'], "-", job['company'])
-            st.write(job['description'])
-            st.write("Location:", job['locations'])
-            st.write("URL:", job['url'])
-            st.write("--------")
-    else:
-        st.warning("Please enter both location and keyword")
+# In your Streamlit app
+st.title('User IP Address')
+try:
+    user_ip = get_client_ip()
+    st.write(f"Your IP address is {user_ip}")
+except ValueError as e:
+    st.error(str(e))
