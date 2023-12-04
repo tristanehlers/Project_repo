@@ -1,58 +1,70 @@
 import streamlit as st
 from requests_oauthlib import OAuth2Session
-from urllib.parse import urlparse, parse_qs
+from requests.exceptions import HTTPError
 
-# Your LinkedIn credentials
-client_id = '78nz3x6cxyj37h'
-client_secret = 'UofXEjpk0jez4CfI'
+# Constants
+CLIENT_ID = '78nz3x6cxyj37h'
+CLIENT_SECRET = 'UofXEjpk0jez4CfI'
+REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'  # Your Streamlit app's address
+AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
+TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
+SCOPE = ['openid', 'profile', 'email']  # Scopes for OpenID Connect
 
-# OAuth endpoints given in the LinkedIn API documentation
-authorization_base_url = 'https://www.linkedin.com/oauth/v2/authorization'
-token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
-redirect_uri = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
+# Function to parse query string
+def get_query_params():
+    return st.experimental_get_query_params()
 
-# Initialize OAuth2 session with the correct scopes
-oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=['r_liteprofile'])
+# Start the OAuth process
+def start_oauth():
+    linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+    authorization_url, state = linkedin.authorization_url(AUTHORIZATION_BASE_URL)
+    # Save the state in session for later use
+    st.session_state['oauth_state'] = state
+    # Redirect to LinkedIn for authorization
+    st.markdown(f"[Log in with LinkedIn]({authorization_url})", unsafe_allow_html=True)
 
-# Generate the authorization URL and save the state
-authorization_url, state = oauth.authorization_url(authorization_base_url)
-st.session_state['oauth_state'] = state
+# Fetch token and user info
+def fetch_token_and_user_info(code):
+    try:
+        linkedin = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        # Add the client_secret parameter to the fetch_token() method call
+        token = linkedin.fetch_token(TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
+        # Save the token in session
+        st.session_state['oauth_token'] = token
 
-# Streamlit app to display authorization URL
-st.write('Please go to this URL and authorize:', authorization_url)
+        # Fetch user info
+        user_info = linkedin.get('https://api.linkedin.com/v2/me').json()
+        st.session_state['user_info'] = user_info
 
-# Streamlit input for the callback URL
-redirect_response = st.text_input('Paste the callback URL here: ')
+        # Fetch user email
+        email_info = linkedin.get('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))').json()
+        st.session_state['email_info'] = email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', '')
 
-if redirect_response:
-    # Parse the state from the callback URL
-    parsed_url = urlparse(redirect_response)
-    callback_state = parse_qs(parsed_url.query)['state'][0] if 'state' in parse_qs(parsed_url.query) else 'No State in URL'
+    except HTTPError as e:
+        st.error(f'An HTTP error occurred: {e.response.status_code}')
+    except Exception as e:
+        st.error(f'An error occurred: {e}')
 
-    # Compare the state in the callback URL to the saved state
-    saved_state = st.session_state.get('oauth_state', 'No State in Session')
+    
+# Main App
+def main():
+    st.title("LinkedIn OpenID Connect Authentication")
 
-    # Check if states match and proceed if they do
-    if callback_state == saved_state:
-        try:
-            # Exchange authorization code for access token
-            token = oauth.fetch_token(token_url, client_secret=client_secret, 
-                                      authorization_response=redirect_response,
-                                      state=callback_state)
+    query_params = get_query_params()
+    code = query_params.get("code")
 
-            # Output the token to the Streamlit app (for debugging purposes)
-            st.write("Access token:", token)
+    if "oauth_token" not in st.session_state:
+        if not code:
+            start_oauth()
+        else:
+            
+            st.success("Authentication successful!")
 
-            # Use token to make LinkedIn API calls
-            linkedin = OAuth2Session(client_id, token=token)
-            # Fetch the user's profile data
-            response = linkedin.get('https://api.linkedin.com/v2/me')
+    if "user_info" in st.session_state:
+        st.write("Your LinkedIn profile information:")
+        st.json(st.session_state['user_info'])
 
-            # Display user profile data in Streamlit
-            st.json(response.json())
+        st.write("Your LinkedIn email information:")
+        st.write(st.session_state['email_info'])
 
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-    else:
-        # If states don't match, output an error message
-        st.error(f"State mismatch error: Callback state {callback_state} does not match saved state {saved_state}.")
+main()
