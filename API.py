@@ -1,6 +1,6 @@
 import requests
 from requests_oauthlib import OAuth2Session
-from oauthlib import BackendApplicationClient
+import oauthlib
 
 # Your LinkedIn credentials
 client_id = '785jejrypgi7ks'
