@@ -1,2 +1,2 @@
-careerjet_api_client
+areerjet-api-client
 streamlit
