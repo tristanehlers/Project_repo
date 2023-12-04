@@ -8,7 +8,7 @@ CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-SCOPE = 'openid profile email'  # Make sure this scope is correctly set in your LinkedIn app
+SCOPE = 'r_liteprofile r_emailaddress'
 
 # Function to initiate OAuth process and handle token retrieval
 def handle_oauth():
@@ -26,11 +26,18 @@ def handle_oauth():
             )
             st.session_state['oauth_token'] = token
             st.write("Received token:", token)  # Display token
-            # Display the scopes
-            st.write("Scopes granted:", token['scope'].split(' '))  # Assuming scopes are space-separated
+
+            # Fetch user profile information
+            profile_info = linkedin.get('https://api.linkedin.com/v2/me').json()
+            st.write("Your LinkedIn profile information:", profile_info)
+
+            # Fetch user email address
+            email_info = linkedin.get('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))').json()
+            st.write("Your LinkedIn email address:", email_info.get('elements', [])[0].get('handle~', {}).get('emailAddress', ''))
 
         except HTTPError as e:
             st.error(f'HTTP error occurred: {e.response.status_code}')
+            st.error(e.response.text)
         except Exception as e:
             st.error(f'An error occurred: {e}')
 
@@ -40,11 +47,9 @@ def main():
     if 'oauth_token' not in st.session_state:
         handle_oauth()
     else:
-        # If token exists in session state, show the token and scopes
-        token = st.session_state['oauth_token']
-        st.write("Your LinkedIn access token is:", token['access_token'])
-        # Display the scopes
-        st.write("Scopes granted:", token['scope'].split(' '))  # Assuming scopes are space-separated
+        # If token exists in session state, show user information
+        st.write("You are already authenticated")
+        st.json(st.session_state['oauth_token'])
 
 if __name__ == "__main__":
     main()
