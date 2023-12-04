@@ -1,4 +1,2 @@
-requests
-requests_oauthlib
-oauthlib
+careerjet_api_client
 streamlit
