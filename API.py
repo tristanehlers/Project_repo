@@ -3,8 +3,8 @@ from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
 
 # Constants
-CLIENT_ID = 'Key_01'
-CLIENT_SECRET = 'Key_02'
+CLIENT_ID = '785jejrypgi7ks'
+CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
