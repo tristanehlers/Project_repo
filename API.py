@@ -30,7 +30,14 @@ def handle_oauth():
 # Main App
 def main():
     st.title("LinkedIn OpenID Connect Authentication")
-    handle_oauth()
+    if 'token' not in st.session_state:
+        handle_oauth()
+    else:
+        # Display the token and scopes
+        st.write("Your LinkedIn access token is:", st.session_state['token']['access_token'])
+        
+        # Now also display the scopes
+        st.write("Scopes granted:")
+        st.write(st.session_state['token']['scope'].split(','))  # Scopes are often returned as a comma-separated string
 
-if __name__ == "__main__":
-    main()
+
