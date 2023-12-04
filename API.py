@@ -12,7 +12,7 @@ token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
 redirect_uri = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 
 # Initialize OAuth2 session
-oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=['r_liteprofile', 'w_member_social'])
+oauth = OAuth2Session(client_id=client_id, redirect_uri=redirect_uri, scope=['openid'])
 authorization_url, state = oauth.authorization_url(authorization_base_url)
 
 # Streamlit app to display authorization URL
