@@ -1,29 +1,36 @@
-from starlette.requests import Request
-from starlette.middleware import Middleware
-from starlette.middleware.base import BaseHTTPMiddleware
 import streamlit as st
+from careerjet_api_client import CareerjetAPIClient
 
-# Custom middleware to capture the client's IP address
-class CaptureIPMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        client_ip = request.client.host
-        response = await call_next(request)
-        request.state.ip = client_ip  # Storing the IP in the request state
-        return response
+# Initialize the Careerjet API client with your locale
+cj = CareerjetAPIClient("en_GB") # or any other locale code
 
-# Register the middleware with Streamlit
-middleware = [Middleware(CaptureIPMiddleware)]
-st.set_page_config(page_title='My Streamlit App', page_icon=':tada:', layout='wide', initial_sidebar_state='auto', menu_items=None, middleware=middleware)
+# Streamlit app layout
+st.title("Job Search with Careerjet")
 
-# Access the client IP from within a Streamlit app
-def get_client_ip():
-    ctx = st.report_thread.get_report_ctx()
-    session_info = st.server.server.Server.get_current()._get_session_info(ctx.session_id)
-    if session_info is None:
-        return None
-    request = session_info.ws.request
-    return request['client'][0] if 'client' in request else None
+# Input fields for the search criteria
+location = st.text_input("Location", "london")
+keywords = st.text_input("Keywords", "python")
 
-# Use the function in your app
-client_ip = get_client_ip()
-st.write(f"Client IP: {client_ip}")
+# Button to perform the search
+if st.button("Search Jobs"):
+    # Using the Careerjet API client to search for jobs
+    result_json = cj.search({
+        'location': location,
+        'keywords': keywords,
+        'affid': '213e213hd12344552', # Replace with your affiliate ID
+        'user_ip': '192.168.1.29', # Replace with the user's IP
+        'url': 'http://www.example.com/jobsearch', # Replace with the URL where the results will be displayed
+        'user_agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0',
+        'pagesize': 10,
+    })
+
+    # Displaying the search results
+    if result_json and 'jobs' in result_json:
+        for job in result_json['jobs']:
+            st.write(job['title'])
+            st.write(job['company'])
+            st.write(job['description'])
+            st.write(job['url'])
+            st.write("---------")
+    else:
+        st.error("No jobs found")
