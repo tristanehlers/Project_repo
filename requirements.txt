@@ -3,4 +3,4 @@ requests
 requests_oauthlib
 oauthlib
 streamlit-oauth
-BackendApplicationClient
+oauthlib.oauth2
