@@ -27,7 +27,7 @@ if redirect_response:
 
     # Use token to make LinkedIn API calls
     linkedin = OAuth2Session(client_id, token=token)
-    response = linkedin.get('https://api.linkedin.com/v2/me')
+    response = linkedin.get('https://api.linkedin.com/v2/userinfo')
 
     # Display user profile data in Streamlit
     st.json(response.json())
