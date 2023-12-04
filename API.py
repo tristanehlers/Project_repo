@@ -1,24 +1,29 @@
+from starlette.requests import Request
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 import streamlit as st
-from streamlit_server_state import server_state, server_state_access
 
-@server_state_access
+# Custom middleware to capture the client's IP address
+class CaptureIPMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        client_ip = request.client.host
+        response = await call_next(request)
+        request.state.ip = client_ip  # Storing the IP in the request state
+        return response
+
+# Register the middleware with Streamlit
+middleware = [Middleware(CaptureIPMiddleware)]
+st.set_page_config(page_title='My Streamlit App', page_icon=':tada:', layout='wide', initial_sidebar_state='auto', menu_items=None, middleware=middleware)
+
+# Access the client IP from within a Streamlit app
 def get_client_ip():
-    if server_state.client_ip is None:
-        raise ValueError("Client IP is not set on the server state!")
-    return server_state.client_ip
+    ctx = st.report_thread.get_report_ctx()
+    session_info = st.server.server.Server.get_current()._get_session_info(ctx.session_id)
+    if session_info is None:
+        return None
+    request = session_info.ws.request
+    return request['client'][0] if 'client' in request else None
 
-# Somewhere in your server initialization code
-# This is pseudo-code and would need to be adapted to your specific server setup
-@server.route("/streamlit_app")
-def streamlit_app_route():
-    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    server_state.client_ip = client_ip
-    return render_streamlit_app()
-
-# In your Streamlit app
-st.title('User IP Address')
-try:
-    user_ip = get_client_ip()
-    st.write(f"Your IP address is {user_ip}")
-except ValueError as e:
-    st.error(str(e))
+# Use the function in your app
+client_ip = get_client_ip()
+st.write(f"Client IP: {client_ip}")
