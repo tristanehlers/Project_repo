@@ -7,7 +7,7 @@ CLIENT_SECRET = '4ZwcgJ0s0ENgcVuA'
 REDIRECT_URI = 'https://kup7u2ixdrj2gdn6wmq3er.streamlit.app/'
 AUTHORIZATION_BASE_URL = 'https://www.linkedin.com/oauth/v2/authorization'
 TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
-SCOPE = 'r_liteprofile r_emailaddress'  # Updated scope format
+SCOPE = 'openid profile email'  # Updated scope format
 
 # Create OAuth2Component instance
 oauth2 = OAuth2Component(CLIENT_ID, CLIENT_SECRET, AUTHORIZATION_BASE_URL, TOKEN_URL)
