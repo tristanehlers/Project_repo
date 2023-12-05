@@ -11,6 +11,7 @@ api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
 # Country to geo_id mapping
 country_geo_id_mapping = {
+    'Global': '92000000',
     'Austria': '103883259',
     'France': '105015875',
     'Germany': '101282230',
