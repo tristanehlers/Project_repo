@@ -4,7 +4,7 @@ import requests
 st.title("Job Search")
 
 # Define the API key and headers
-api_key = 'YOUR_API_KEY'  # Replace with your actual API key
+api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Replace with your actual API key
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
