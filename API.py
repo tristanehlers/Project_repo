@@ -11,12 +11,14 @@ api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
 # Country to geo_id mapping
 country_geo_id_mapping = {
-    'Germany': '101282230',
-    'Switzerland': '106693272',
     'Austria': '103883259',
-    'USA': '103644278',
     'France': '105015875',
-    'Italy': '103350119'
+    'Germany': '101282230',
+    'Italy': '103350119',
+    'Switzerland': '106693272',
+    'USA': '103644278'
+    
+    
 }
 
 # Initialize session state variables
@@ -25,19 +27,20 @@ if 'jobs' not in st.session_state:
     st.session_state['next_page_url'] = None
     st.session_state['search_initiated'] = False
 
-# Layout for the title and logo
-st.header("Job Search")
-_, logo_col = st.columns([0.9, 0.1])  # Adjust the ratio if necessary for alignment
+# Title and logo layout
+header_col, logo_col = st.columns([0.85, 0.15])
+with header_col:
+    st.header("Job Search")
 with logo_col:
     st.image(logo_url, width=60)  # Adjust width as needed
 
 # Create search fields for user input
 country = st.selectbox('Country', list(country_geo_id_mapping.keys()))
-job_type = st.selectbox('Job Type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
-experience_level = st.selectbox('Experience Level', ['Anything', 'Internship', 'Entry Level', 'Associate', 'Mid-Senior Level', 'Director'])
-when = st.selectbox('When', ['Anytime', 'Yesterday', 'Past-Week', 'Past-Month'])
+job_type = st.selectbox('Employment type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
+experience_level = st.selectbox('Experience level', ['Anything', 'Internship', 'Entry Level', 'Associate', 'Mid-Senior Level', 'Director'])
+when = st.selectbox('Job posted on', ['Anytime', 'Yesterday', 'Past-Week', 'Past-Month'])
 flexibility = st.selectbox('Flexibility', ['Anything', 'Remote', 'On-Site', 'Hybrid'])
-keyword = st.text_input('Keyword', '')
+keyword = st.text_input('Keywords', '')
 
 # Function to display jobs
 def display_jobs(jobs, container):
@@ -48,19 +51,19 @@ def display_jobs(jobs, container):
         container.write(f"[Job Details]({job['job_url']})")
         container.write("---------")
 
-# Container for displaying jobs, placed in the right order
+# Container to display jobs below the input fields
 jobs_container = st.container()
 
 # Button to perform the API call
 if st.button('Search Jobs'):
     st.session_state['search_initiated'] = True
     st.session_state['jobs'] = []  # Clear previous jobs
-    selected_geo_id = country_geo_id_mapping[country]
+    selected_geo_id = country_geo_id_mapping[country]  # Use the selected country's geo_id
     params = {
-        'job_type': job_type.lower().replace(' ', '_'),
-        'experience_level': experience_level.lower().replace(' ', '_'),
-        'when': when.lower().replace(' ', '_'),
-        'flexibility': flexibility.lower().replace(' ', '_'),
+        'job_type': job_type.replace(' ', '_').lower(),
+        'experience_level': experience_level.replace(' ', '_').lower(),
+        'when': when.replace(' ', '_').lower(),
+        'flexibility': flexibility.replace(' ', '_').lower(),
         'geo_id': selected_geo_id,
         'keyword': keyword
     }
