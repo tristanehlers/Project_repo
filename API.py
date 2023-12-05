@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Define the API key and headers
-api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'
+api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Replace with your actual API key
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
@@ -19,27 +19,6 @@ country_geo_id_mapping = {
     'Italy': '103350119'
 }
 
-# Initialize session state variables
-if 'jobs' not in st.session_state:
-    st.session_state['jobs'] = []
-    st.session_state['next_page_url'] = None
-    st.session_state['search_initiated'] = False
-
-# Layout for the title and logo
-col1, col2 = st.columns([8, 2], gap="small")
-with col1:
-    st.markdown("# Job Search", unsafe_allow_html=True)
-with col2:
-    st.image(logo_url, width=60)  # Adjust the size to 40% of the original
-
-# Create search fields for user input
-country = st.selectbox('Country', list(country_geo_id_mapping.keys()))
-job_type = st.selectbox('Job Type', list(country_geo_id_mapping.keys()))
-experience_level = st.selectbox('Experience Level', list(country_geo_id_mapping.keys()))
-when = st.selectbox('When', list(country_geo_id_mapping.keys()))
-flexibility = st.selectbox('Flexibility', list(country_geo_id_mapping.keys()))
-keyword = st.text_input('Keyword', '')
-
 # Function to display jobs
 def display_jobs(jobs, container):
     for job in jobs:
@@ -49,19 +28,41 @@ def display_jobs(jobs, container):
         container.write(f"[Job Details]({job['job_url']})")
         container.write("---------")
 
+# Initialize session state variables
+if 'jobs' not in st.session_state:
+    st.session_state['jobs'] = []
+    st.session_state['next_page_url'] = None
+    st.session_state['search_initiated'] = False
+
+# Adjust layout for the title and logo
+col1, col2 = st.columns([0.8, 0.2])
+with col1:
+    st.title("Job Search")
+
+with col2:
+    st.image(logo_url, width=40)  # Adjust width as needed to fit the end of the input boxes
+
+# Create search fields for user input
+country = st.selectbox('Country', list(country_geo_id_mapping.keys()))
+job_type = st.selectbox('Job Type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
+experience_level = st.selectbox('Experience Level', ['Anything', 'Internship', 'Entry Level', 'Associate', 'Mid-Senior Level', 'Director'])
+when = st.selectbox('When', ['Anytime', 'Yesterday', 'Past-Week', 'Past-Month'])
+flexibility = st.selectbox('Flexibility', ['Anything', 'Remote', 'On-Site', 'Hybrid'])
+keyword = st.text_input('Keyword', '')
+
 # Container to display jobs below the input fields
 jobs_container = st.container()
 
 # Button to perform the API call
 if st.button('Search Jobs'):
     st.session_state['search_initiated'] = True
-    st.session_state['jobs'] = []
-    selected_geo_id = country_geo_id_mapping[country]
+    st.session_state['jobs'] = []  # Clear previous jobs
+    selected_geo_id = country_geo_id_mapping[country]  # Use the selected country's geo_id
     params = {
-        'job_type': job_type,
-        'experience_level': experience_level,
-        'when': when,
-        'flexibility': flexibility,
+        'job_type': job_type.replace(' ', '_').lower(),
+        'experience_level': experience_level.replace(' ', '_').lower(),
+        'when': when.replace(' ', '_').lower(),
+        'flexibility': flexibility.replace(' ', '_').lower(),
         'geo_id': selected_geo_id,
         'keyword': keyword
     }
