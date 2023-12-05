@@ -27,52 +27,54 @@ when = st.selectbox('When', ['anytime', 'yesterday', 'past-week', 'past-month'])
 flexibility = st.selectbox('Flexibility', ['anything', 'remote', 'on-site', 'hybrid'])
 keyword = st.text_input('Keyword', '')
 
+# Initialize session state for pagination
+if 'jobs' not in st.session_state:
+    st.session_state.jobs = []
+
+# Button to perform the API call
+search_button = st.button('Search Jobs')
+
 # Container to display jobs below the input fields
 jobs_container = st.container()
 
-# Button to perform the API call
-if st.button('Search Jobs'):
-    st.session_state['next_page_url'] = None  # Reset the next page URL
-
-    # Make the API call with the user input, including the geo_id parameter
-    params = {
-        'job_type': job_type,
-        'experience_level': experience_level,
-        'when': when,
-        'flexibility': flexibility,
-        'geo_id': geo_id,
-        'keyword': keyword
-    }
-    
-    response = requests.get(api_endpoint, params=params, headers=headers)
-    
-    # Check if the request was successful
-    if response.status_code == 200:
-        jobs = response.json().get('job', [])
-        with jobs_container:
-            display_jobs(jobs)
-        
-        # Handle pagination if there are more pages
-        next_page_url = response.json().get('next_page_api_url')
-        if next_page_url:
-            st.session_state['next_page_url'] = next_page_url
-
-    else:
-        st.error(f"Failed to retrieve jobs: {response.status_code}")
-
 # Function to load more jobs
 def load_more_jobs():
-    next_page_url = st.session_state.get('next_page_url')
-    if next_page_url:
-        response = requests.get(next_page_url, headers=headers)
+    # Use the next page URL from session state to get more jobs
+    response = requests.get(st.session_state['next_page_url'], headers=headers)
+    if response.status_code == 200:
+        new_jobs = response.json().get('job', [])
+        st.session_state.jobs.extend(new_jobs)  # Add new jobs to the existing list
+        st.session_state['next_page_url'] = response.json().get('next_page_api_url', None)
+    else:
+        st.error(f"Failed to load more jobs: {response.status_code}")
+    # Re-render all jobs including new ones
+    with jobs_container:
+        display_jobs(st.session_state.jobs)
+
+if search_button or 'next_page_url' in st.session_state:
+    # If search button is pressed or there's a next page from a previous search
+    if search_button:
+        # Reset the jobs list in state
+        st.session_state.jobs = []
+        # Make the API call with the user input, including the geo_id parameter
+        params = {
+            'job_type': job_type,
+            'experience_level': experience_level,
+            'when': when,
+            'flexibility': flexibility,
+            'geo_id': geo_id,
+            'keyword': keyword
+        }
+        response = requests.get(api_endpoint, params=params, headers=headers)
         if response.status_code == 200:
-            jobs = response.json().get('job', [])
-            with jobs_container:
-                display_jobs(jobs)
-            st.session_state['next_page_url'] = response.json().get('next_page_api_url')
+            st.session_state.jobs = response.json().get('job', [])
+            st.session_state['next_page_url'] = response.json().get('next_page_api_url', None)
         else:
-            st.error(f"Failed to load more jobs: {response.status_code}")
+            st.error(f"Failed to retrieve jobs: {response.status_code}")
+    # Display jobs
+    with jobs_container:
+        display_jobs(st.session_state.jobs)
 
 # Button to load more jobs, if there is a next page URL available
-if st.session_state.get('next_page_url'):
+if 'next_page_url' in st.session_state and st.session_state['next_page_url']:
     st.button('Load More', on_click=load_more_jobs)
