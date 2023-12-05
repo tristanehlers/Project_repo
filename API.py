@@ -1,12 +1,13 @@
 import streamlit as st
 import requests
 
-st.title("Job Search")
-
 # Define the API key and headers
 api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Replace with your actual API key
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
+
+# URL of the LinkedIn logo
+logo_url = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png'
 
 # Set the geo_id parameter which the user cannot change
 geo_id = '101282230'
@@ -14,12 +15,6 @@ geo_id = '101282230'
 # Function to capitalize labels
 def capitalize_labels(options):
     return [option.replace('_', ' ').title() for option in options]
-
-# Initialize session state variables
-if 'jobs' not in st.session_state:
-    st.session_state['jobs'] = []
-    st.session_state['next_page_url'] = None
-    st.session_state['search_initiated'] = False
 
 # Function to display jobs
 def display_jobs(jobs):
@@ -29,6 +24,23 @@ def display_jobs(jobs):
         st.write(f"Listed on: {job['list_date']}")
         st.write(f"[Job Details]({job['job_url']})")
         st.write("---------")
+
+# Initialize session state variables
+if 'jobs' not in st.session_state:
+    st.session_state['jobs'] = []
+    st.session_state['next_page_url'] = None
+    st.session_state['search_initiated'] = False
+
+# Create columns for the title and the logo
+col1, col2 = st.columns([3, 1])
+
+# Display the title in the first column
+with col1:
+    st.title("Job Search")
+
+# Display the logo in the second column
+with col2:
+    st.image(logo_url, width=int(200 * 0.4))  # 40% of the original size
 
 # Create search fields for user input
 job_type_options = ['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer']
