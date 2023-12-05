@@ -17,8 +17,6 @@ country_geo_id_mapping = {
     'Italy': '103350119',
     'Switzerland': '106693272',
     'USA': '103644278'
-    
-    
 }
 
 # Initialize session state variables
@@ -42,18 +40,6 @@ when = st.selectbox('Job posted on', ['Anytime', 'Yesterday', 'Past-Week', 'Past
 flexibility = st.selectbox('Flexibility', ['Anything', 'Remote', 'On-Site', 'Hybrid'])
 keyword = st.text_input('Keywords', '')
 
-# Function to display jobs
-def display_jobs(jobs, container):
-    for job in jobs:
-        container.write(f"**{job['job_title']}** at **{job['company']}**")
-        container.write(f"Location: {job['location']}")
-        container.write(f"Listed on: {job['list_date']}")
-        container.write(f"[Job Details]({job['job_url']})")
-        container.write("---------")
-
-# Container to display jobs below the input fields
-jobs_container = st.container()
-
 # Button to perform the API call
 if st.button('Search Jobs'):
     st.session_state['search_initiated'] = True
@@ -71,9 +57,24 @@ if st.button('Search Jobs'):
     if response.status_code == 200:
         st.session_state['jobs'] = response.json().get('job', [])
         st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-        display_jobs(st.session_state['jobs'], jobs_container)
     else:
         st.error(f"Failed to retrieve jobs: {response.status_code}")
+
+# Container to display jobs below the button
+jobs_container = st.container()
+
+# Function to display jobs
+def display_jobs(jobs, container):
+    for job in jobs:
+        container.write(f"**{job['job_title']}** at **{job['company']}**")
+        container.write(f"Location: {job['location']}")
+        container.write(f"Listed on: {job['list_date']}")
+        container.write(f"[Job Details]({job['job_url']})")
+        container.write("---------")
+
+# Display jobs if any
+if st.session_state['jobs']:
+    display_jobs(st.session_state['jobs'], jobs_container)
 
 # Function to load more jobs
 def load_more_jobs():
