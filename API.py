@@ -1,26 +1,10 @@
 import streamlit as st
 import requests
 
-# URL of the LinkedIn logo
-logo_url = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png'
-
 # Define the API key and headers
-api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Replace with your actual API key
+api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
-
-# Function to capitalize labels
-def capitalize_labels(options):
-    return [option.replace('_', ' ').title() for option in options]
-
-# Function to display jobs
-def display_jobs(jobs):
-    for job in jobs:
-        st.write(f"**{job['job_title']}** at **{job['company']}**")
-        st.write(f"Location: {job['location']}")
-        st.write(f"Listed on: {job['list_date']}")
-        st.write(f"[Job Details]({job['job_url']})")
-        st.write("---------")
 
 # Country to geo_id mapping
 country_geo_id_mapping = {
@@ -32,19 +16,34 @@ country_geo_id_mapping = {
     'Italy': '103350119'
 }
 
+# Function to capitalize labels
+def capitalize_labels(options):
+    return [option.replace('_', ' ').title() for option in options]
+
+# Function to display jobs
+def display_jobs(jobs, container):
+    for job in jobs:
+        container.write(f"**{job['job_title']}** at **{job['company']}**")
+        container.write(f"Location: {job['location']}")
+        container.write(f"Listed on: {job['list_date']}")
+        container.write(f"[Job Details]({job['job_url']})")
+        container.write("---------")
+
 # Initialize session state variables
 if 'jobs' not in st.session_state:
     st.session_state['jobs'] = []
     st.session_state['next_page_url'] = None
     st.session_state['search_initiated'] = False
 
-# Layout for the title and logo
-st.title("Job Search")
+# Title and logo layout
 col1, col2 = st.columns([8, 2])
 with col1:
-    st.write("")  # Spacer to align title with the input fields
+    st.write("")
 with col2:
-    st.image(logo_url, width=int(200 * 0.4))  # Adjust the size to 40% of the original
+    st.image('https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png', width=60)
+
+# Adjusting the title position
+st.markdown("<h1 style='text-align: center; margin-bottom: -20px;'>Job Search</h1>", unsafe_allow_html=True)
 
 # Create search fields for user input
 country = st.selectbox('Country', list(country_geo_id_mapping.keys()))
@@ -54,11 +53,14 @@ when = st.selectbox('When', capitalize_labels(['anytime', 'yesterday', 'past-wee
 flexibility = st.selectbox('Flexibility', capitalize_labels(['anything', 'remote', 'on-site', 'hybrid']))
 keyword = st.text_input('Keyword', '')
 
+# Container for displaying jobs, placed in the right order
+jobs_container = st.container()
+
 # Button to perform the API call
 if st.button('Search Jobs'):
     st.session_state['search_initiated'] = True
-    st.session_state['jobs'] = []
-    selected_geo_id = country_geo_id_mapping[country]  # Use the selected country's geo_id
+    st.session_state['jobs'] = []  # Clear previous jobs
+    selected_geo_id = country_geo_id_mapping[country]
     params = {
         'job_type': job_type.lower().replace(' ', '_'),
         'experience_level': experience_level.lower().replace(' ', '_'),
@@ -71,7 +73,7 @@ if st.button('Search Jobs'):
     if response.status_code == 200:
         st.session_state['jobs'] = response.json().get('job', [])
         st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-        display_jobs(st.session_state['jobs'])
+        display_jobs(st.session_state['jobs'], jobs_container)
     else:
         st.error(f"Failed to retrieve jobs: {response.status_code}")
 
@@ -84,7 +86,7 @@ def load_more_jobs():
             new_jobs = response.json().get('job', [])
             st.session_state['jobs'].extend(new_jobs)
             st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-            display_jobs(st.session_state['jobs'])
+            display_jobs(st.session_state['jobs'], jobs_container)
         else:
             st.error(f"Failed to load more jobs: {response.status_code}")
 
