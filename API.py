@@ -36,8 +36,8 @@ with logo_col:
 
 # Create search fields for user input
 country = st.selectbox('Country', list(country_geo_id_mapping.keys()))
-job_type = st.selectbox('Employment Type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
-experience_level = st.selectbox('Experience Level', ['Anything', 'Internship', 'Entry Level', 'Associate', 'Mid-Senior Level', 'Director'])
+job_type = st.selectbox('Employment type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
+experience_level = st.selectbox('Experience level', ['Anything', 'Internship', 'Entry Level', 'Associate', 'Mid-Senior Level', 'Director'])
 when = st.selectbox('Job posted on', ['Anytime', 'Yesterday', 'Past-Week', 'Past-Month'])
 flexibility = st.selectbox('Flexibility', ['Anything', 'Remote', 'On-Site', 'Hybrid'])
 keyword = st.text_input('Keywords', '')
