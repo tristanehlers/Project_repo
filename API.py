@@ -31,28 +31,26 @@ if 'jobs' not in st.session_state:
     st.session_state['next_page_url'] = None
     st.session_state['search_initiated'] = False
 
-# Create columns for the title and the logo
-col1, col2 = st.columns([3, 1])
+# Adjust the column widths to align the logo with the end of the input fields
+col1, col2 = st.columns([0.9, 0.1])
 
 # Display the title in the first column
 with col1:
-    st.title("Job Search")
+    st.markdown("<h1 style='text-align: left;'>Job Search</h1>", unsafe_allow_html=True)
 
 # Display the logo in the second column
 with col2:
-    st.image(logo_url, width=int(200 * 0.4))  # 40% of the original size
+    st.image(logo_url, width=60)  # Reduce the size of the picture by 60%
 
 # Create search fields for user input
-job_type_options = ['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer']
-experience_level_options = ['anything', 'internship', 'entry_level', 'associate', 'mid_senior_level', 'director']
-when_options = ['anytime', 'yesterday', 'past-week', 'past-month']
-flexibility_options = ['anything', 'remote', 'on-site', 'hybrid']
-
-job_type = st.selectbox('Job Type', capitalize_labels(job_type_options))
-experience_level = st.selectbox('Experience Level', capitalize_labels(experience_level_options))
-when = st.selectbox('When', capitalize_labels(when_options))
-flexibility = st.selectbox('Flexibility', capitalize_labels(flexibility_options))
+job_type = st.selectbox('Job Type', capitalize_labels(['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer']))
+experience_level = st.selectbox('Experience Level', capitalize_labels(['anything', 'internship', 'entry_level', 'associate', 'mid_senior_level', 'director']))
+when = st.selectbox('When', capitalize_labels(['anytime', 'yesterday', 'past-week', 'past-month']))
+flexibility = st.selectbox('Flexibility', capitalize_labels(['anything', 'remote', 'on-site', 'hybrid']))
 keyword = st.text_input('Keyword', '')
+
+# Container to display jobs below the input fields
+jobs_container = st.container()
 
 # Button to perform the API call
 if st.button('Search Jobs'):
