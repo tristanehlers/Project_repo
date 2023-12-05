@@ -36,11 +36,11 @@ with logo_col:
 
 # Create search fields for user input
 country = st.selectbox('Country', list(country_geo_id_mapping.keys()))
-job_type = st.selectbox('Job Type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
+job_type = st.selectbox('Employment Type', ['Anything', 'Full Time', 'Part Time', 'Internship', 'Contract', 'Temporary', 'Volunteer'])
 experience_level = st.selectbox('Experience Level', ['Anything', 'Internship', 'Entry Level', 'Associate', 'Mid-Senior Level', 'Director'])
 when = st.selectbox('Job posted on', ['Anytime', 'Yesterday', 'Past-Week', 'Past-Month'])
 flexibility = st.selectbox('Flexibility', ['Anything', 'Remote', 'On-Site', 'Hybrid'])
-keyword = st.text_input('Keyword', '')
+keyword = st.text_input('Keywords', '')
 
 # Function to display jobs
 def display_jobs(jobs, container):
