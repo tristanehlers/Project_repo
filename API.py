@@ -1,47 +1,47 @@
 import streamlit as st
+import requests
 
-try:
-    from careerjet_api_client import CareerjetAPIClient
-except ImportError as e:
-    st.error(f"An error occurred while importing CareerjetAPIClient: {e}")
-    # Add any necessary logic to handle the import error here
-    raise
+st.title("Job Search")
 
-# Initialize the Careerjet API client with your locale
-cj = CareerjetAPIClient("en_GB")  # or any other locale code
+# Define the API key and headers
+api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Replace with your actual API key
+headers = {'Authorization': 'Bearer ' + api_key}
+api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
-# Streamlit app layout
-st.title("Job Search with Careerjet")
+# Create search fields for user input
+job_type = st.selectbox('Job Type', ['', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer', 'anything'])
+experience_level = st.selectbox('Experience Level', ['', 'internship', 'entry_level', 'associate', 'mid_senior_level', 'director', 'executive'])
+when = st.selectbox('When', ['', 'past-day', 'past-week', 'past-month'])
+flexibility = st.selectbox('Flexibility', ['', 'remote', 'in-person'])
+geo_id = st.text_input('Geo ID', '92000000')
+keyword = st.text_input('Keyword', 'software engineer')
+search_id = st.text_input('Search ID', '1035')
 
-# Input fields for the search criteria
-location = st.text_input("Location", "london")
-keywords = st.text_input("Keywords", "python")
-
-# Button to perform the search
-if st.button("Search Jobs"):
-    try:
-        # Using the Careerjet API client to search for jobs
-        result_json = cj.search({
-            'location': location,
-            'keywords': keywords,
-            'affid': '213e213hd12344552',  # Replace with your affiliate ID
-            'user_ip': '192.168.1.29',  # Replace with the user's IP
-            'url': 'http://www.example.com/jobsearch',  # Replace with the URL where the results will be displayed
-            'user_agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0',
-            'pagesize': 10,
-        })
-    except Exception as e:
-        st.error(f"An error occurred while searching for jobs: {e}")
-        # Add any necessary logic to handle the search error here
-        raise
-
-    # Displaying the search results
-    if result_json and 'jobs' in result_json:
-        for job in result_json['jobs']:
+# Button to perform the API call
+if st.button('Search Jobs'):
+    # Make the API call with the user input
+    params = {
+        'job_type': job_type,
+        'experience_level': experience_level,
+        'when': when,
+        'flexibility': flexibility,
+        'geo_id': geo_id,
+        'keyword': keyword,
+        'search_id': search_id,
+    }
+    
+    response = requests.get(api_endpoint, params=params, headers=headers)
+    
+    # Check if the request was successful
+    if response.status_code == 200:
+        jobs = response.json()
+        # Display the job results - you may need to adjust this based on the actual response structure
+        for job in jobs.get('data', []):
             st.write(job['title'])
-            st.write(job['company'])
+            st.write(job['companyName'])
+            st.write(job['location'])
             st.write(job['description'])
-            st.write(job['url'])
+            st.write(job['listingUrl'])
             st.write("---------")
     else:
-        st.error("No jobs found")
+        st.error(f"Failed to retrieve jobs: {response.status_code}")
