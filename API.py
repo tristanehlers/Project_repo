@@ -44,11 +44,6 @@ def load_more_jobs():
         else:
             st.error(f"Failed to load more jobs: {response.status_code}")
 
-# Function to show the load more button
-def show_load_more_button():
-    if st.session_state.get('next_page_url'):
-        st.button('Load More', on_click=load_more_jobs)
-
 # Container to display jobs below the input fields
 jobs_container = st.container()
 
@@ -74,13 +69,12 @@ if st.button('Search Jobs'):
         jobs = response.json().get('job', [])
         display_jobs(jobs, jobs_container)
         
-        # Show the 'Load More' button if there are more pages
+        # Store the next page URL in the session state if there are more pages
         st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-        if st.session_state['next_page_url']:
-            show_load_more_button()
+
     else:
         st.error(f"Failed to retrieve jobs: {response.status_code}")
 
-# Show the 'Load More' button if search has been initiated and there is a next page URL available
-if st.session_state['search_initiated']:
-    show_load_more_button()
+# Only show the 'Load More' button if the search has been initiated and there's a next page URL available
+if st.session_state['search_initiated'] and st.session_state['next_page_url']:
+    st.button('Load More', on_click=load_more_jobs)
