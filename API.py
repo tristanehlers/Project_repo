@@ -11,12 +11,14 @@ api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
 # Country to geo_id mapping
 country_geo_id_mapping = {
-    'Germany': '101282230',
-    'Switzerland': '106693272',
     'Austria': '103883259',
-    'USA': '103644278',
     'France': '105015875',
-    'Italy': '103350119'
+    'Germany': '101282230',
+    'Italy': '103350119',
+    'Switzerland': '106693272',
+    'USA': '103644278'
+    
+    
 }
 
 # Initialize session state variables
