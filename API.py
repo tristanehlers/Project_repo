@@ -8,6 +8,9 @@ api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Replace with your actual API key
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 
+# Set the geo_id parameter which the user cannot change
+geo_id = '101282230'
+
 # Create search fields for user input
 job_type = st.selectbox('Job Type', ['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer'])
 experience_level = st.selectbox('Experience Level', ['anything', 'internship', 'entry_level', 'associate', 'mid_senior_level', 'director'])
@@ -17,12 +20,13 @@ keyword = st.text_input('Keyword', '')
 
 # Button to perform the API call
 if st.button('Search Jobs'):
-    # Make the API call with the user input
+    # Make the API call with the user input, including the geo_id parameter
     params = {
         'job_type': job_type,
         'experience_level': experience_level,
         'when': when,
         'flexibility': flexibility,
+        'geo_id': geo_id,  # Include the geo_id in the parameters
         'keyword': keyword
     }
     
