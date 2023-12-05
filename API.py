@@ -32,6 +32,23 @@ when = st.selectbox('When', ['anytime', 'yesterday', 'past-week', 'past-month'])
 flexibility = st.selectbox('Flexibility', ['anything', 'remote', 'on-site', 'hybrid'])
 keyword = st.text_input('Keyword', '')
 
+# Function to load more jobs
+def load_more_jobs():
+    next_page_url = st.session_state.get('next_page_url')
+    if next_page_url:
+        response = requests.get(next_page_url, headers=headers)
+        if response.status_code == 200:
+            jobs = response.json().get('job', [])
+            display_jobs(jobs, jobs_container)
+            st.session_state['next_page_url'] = response.json().get('next_page_api_url')
+        else:
+            st.error(f"Failed to load more jobs: {response.status_code}")
+
+# Function to show the load more button
+def show_load_more_button():
+    if st.session_state.get('next_page_url'):
+        st.button('Load More', on_click=load_more_jobs)
+
 # Container to display jobs below the input fields
 jobs_container = st.container()
 
@@ -57,24 +74,13 @@ if st.button('Search Jobs'):
         jobs = response.json().get('job', [])
         display_jobs(jobs, jobs_container)
         
-        # Handle pagination if there are more pages
+        # Show the 'Load More' button if there are more pages
         st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-
+        if st.session_state['next_page_url']:
+            show_load_more_button()
     else:
         st.error(f"Failed to retrieve jobs: {response.status_code}")
 
-# Function to load more jobs
-def load_more_jobs():
-    next_page_url = st.session_state.get('next_page_url')
-    if next_page_url:
-        response = requests.get(next_page_url, headers=headers)
-        if response.status_code == 200:
-            jobs = response.json().get('job', [])
-            display_jobs(jobs, jobs_container)
-            st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-        else:
-            st.error(f"Failed to load more jobs: {response.status_code}")
-
-# Button to load more jobs, if search has been initiated and there is a next page URL available
-if st.session_state['search_initiated'] and st.session_state.get('next_page_url'):
-    st.button('Load More', on_click=load_more_jobs)
+# Show the 'Load More' button if search has been initiated and there is a next page URL available
+if st.session_state['search_initiated']:
+    show_load_more_button()
