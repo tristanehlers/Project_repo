@@ -11,6 +11,16 @@ api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin/company/job'
 # Set the geo_id parameter which the user cannot change
 geo_id = '101282230'
 
+# Function to capitalize labels
+def capitalize_labels(options):
+    return [option.replace('_', ' ').title() for option in options]
+
+# Initialize session state variables
+if 'jobs' not in st.session_state:
+    st.session_state['jobs'] = []
+    st.session_state['next_page_url'] = None
+    st.session_state['search_initiated'] = False
+
 # Function to display jobs
 def display_jobs(jobs):
     for job in jobs:
@@ -19,16 +29,6 @@ def display_jobs(jobs):
         st.write(f"Listed on: {job['list_date']}")
         st.write(f"[Job Details]({job['job_url']})")
         st.write("---------")
-
-# Initialize session state variables
-if 'jobs' not in st.session_state:
-    st.session_state['jobs'] = []
-    st.session_state['next_page_url'] = None
-    st.session_state['search_initiated'] = False
-
-# Capitalize the first letter of each word for labels
-def capitalize_labels(options):
-    return [option.replace('_', ' ').title() for option in options]
 
 # Create search fields for user input
 job_type_options = ['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer']
@@ -41,9 +41,6 @@ experience_level = st.selectbox('Experience Level', capitalize_labels(experience
 when = st.selectbox('When', capitalize_labels(when_options))
 flexibility = st.selectbox('Flexibility', capitalize_labels(flexibility_options))
 keyword = st.text_input('Keyword', '')
-
-# Container to display jobs below the input fields
-jobs_container = st.container()
 
 # Button to perform the API call
 if st.button('Search Jobs'):
@@ -61,8 +58,7 @@ if st.button('Search Jobs'):
     if response.status_code == 200:
         st.session_state['jobs'] = response.json().get('job', [])
         st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-        with jobs_container:
-            display_jobs(st.session_state['jobs'])
+        display_jobs(st.session_state['jobs'])
     else:
         st.error(f"Failed to retrieve jobs: {response.status_code}")
 
@@ -75,8 +71,7 @@ def load_more_jobs():
             new_jobs = response.json().get('job', [])
             st.session_state['jobs'].extend(new_jobs)  # Append new jobs
             st.session_state['next_page_url'] = response.json().get('next_page_api_url')
-            with jobs_container:
-                display_jobs(st.session_state['jobs'])
+            display_jobs(st.session_state['jobs'])
         else:
             st.error(f"Failed to load more jobs: {response.status_code}")
 
