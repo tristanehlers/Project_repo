@@ -26,29 +26,34 @@ if 'jobs' not in st.session_state:
     st.session_state['next_page_url'] = None
     st.session_state['search_initiated'] = False
 
-# Input fields container
-input_container = st.container()
-with input_container:
-    # Create search fields for user input
-    job_type = st.selectbox('Job Type', ['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer'])
-    experience_level = st.selectbox('Experience Level', ['anything', 'internship', 'entry_level', 'associate', 'mid_senior_level', 'director'])
-    when = st.selectbox('When', ['anytime', 'yesterday', 'past-week', 'past-month'])
-    flexibility = st.selectbox('Flexibility', ['anything', 'remote', 'on-site', 'hybrid'])
-    keyword = st.text_input('Keyword', '')
-    search_button = st.button('Search Jobs')
+# Capitalize the first letter of each word for labels
+def capitalize_labels(options):
+    return [option.replace('_', ' ').title() for option in options]
+
+# Create search fields for user input
+job_type_options = ['anything', 'full_time', 'part_time', 'internship', 'contract', 'temporary', 'volunteer']
+experience_level_options = ['anything', 'internship', 'entry_level', 'associate', 'mid_senior_level', 'director']
+when_options = ['anytime', 'yesterday', 'past-week', 'past-month']
+flexibility_options = ['anything', 'remote', 'on-site', 'hybrid']
+
+job_type = st.selectbox('Job Type', capitalize_labels(job_type_options))
+experience_level = st.selectbox('Experience Level', capitalize_labels(experience_level_options))
+when = st.selectbox('When', capitalize_labels(when_options))
+flexibility = st.selectbox('Flexibility', capitalize_labels(flexibility_options))
+keyword = st.text_input('Keyword', '')
 
 # Container to display jobs below the input fields
 jobs_container = st.container()
 
 # Button to perform the API call
-if search_button:
+if st.button('Search Jobs'):
     st.session_state['search_initiated'] = True
     st.session_state['jobs'] = []  # Clear previous jobs
     params = {
-        'job_type': job_type,
-        'experience_level': experience_level,
-        'when': when,
-        'flexibility': flexibility,
+        'job_type': job_type.lower().replace(' ', '_'),
+        'experience_level': experience_level.lower().replace(' ', '_'),
+        'when': when.lower().replace(' ', '_'),
+        'flexibility': flexibility.lower().replace(' ', '_'),
         'geo_id': geo_id,
         'keyword': keyword
     }
@@ -77,5 +82,4 @@ def load_more_jobs():
 
 # Show the 'Load More' button only if a search has been initiated and there's a next page URL
 if st.session_state['search_initiated'] and st.session_state['next_page_url']:
-    with jobs_container:
-        st.button('Load More', on_click=load_more_jobs)
+    st.button('Load More', on_click=load_more_jobs)
