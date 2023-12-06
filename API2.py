@@ -17,10 +17,10 @@ def extract_info(jsondata):
     return extracted_info
 
 # Streamlit app layout
-st.title('LinkedIn Profile Information Retriever')
+st.title('LinkedIn Profile Filler')
 
 # Input field for LinkedIn profile URL
-linkedin_profile_url = st.text_input('Enter the LinkedIn profile URL', 'https://www.linkedin.com/in/...')
+linkedin_profile_url = st.text_input('Enter your LinkedIn profile URL', 'https://www.linkedin.com/in/...')
 
 # Button to fetch profile information
 if st.button('Retrieve Information'):
