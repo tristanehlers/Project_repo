@@ -16,38 +16,40 @@ def extract_info(jsondata):
     }
     return extracted_info
 
+# Function to fetch and display profile information
+def retrieve_info():
+    params = {'linkedin_profile_url': linkedin_profile_url}
+    response = requests.get(api_endpoint, params=params, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        info = extract_info(data)
+        display_info(info)
+    else:
+        st.error(f"Failed to retrieve profile information: HTTP {response.status_code}")
+
+# Function to display profile information
+def display_info(info):
+    st.subheader('Profile Information:')
+    st.write('Full Name:', info['full_name'])
+    st.write('City:', info['city'])
+    
+    st.subheader('Experiences:')
+    for exp in info['experiences']:
+        st.write('Title:', exp.get('title', 'Not available'))
+        st.write('Company:', exp.get('company', 'Not available'))
+        st.write('Description:', exp.get('description', 'Not available'))
+        st.write('---')  # Separator line
+
 # Streamlit app layout
 st.title('LinkedIn Profile Filler')
+
+# Display LinkedIn logo
+linkedin_logo_url = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png'
+st.image(linkedin_logo_url, width=50)
 
 # Input field for LinkedIn profile URL
 linkedin_profile_url = st.text_input('Enter your LinkedIn profile URL', 'https://www.linkedin.com/in/...')
 
-# Display the clickable image
+# Button to trigger the information retrieval
 if st.button('Retrieve Information'):
     retrieve_info()
-
-def retrieve_info():
-    params = {'linkedin_profile_url': linkedin_profile_url}
-    
-    # Make a request to the API
-    response = requests.get(api_endpoint, params=params, headers=headers)
-    
-    if response.status_code == 200:
-        data = response.json()
-        info = extract_info(data)
-        
-        # Display the extracted information
-        st.subheader('Profile Information:')
-        st.write('Full Name:', info['full_name'])
-        st.write('City:', info['city'])
-        
-        st.subheader('Experiences:')
-        for exp in info['experiences']:
-            st.write('Title:', exp.get('title', 'Not available'))
-            st.write('Company:', exp.get('company', 'Not available'))
-            st.write('Description:', exp.get('description', 'Not available'))
-            st.write('---')  # Separator line
-    else:
-        st.error(f"Failed to retrieve profile information: HTTP {response.status_code}")
-
-# Load the image from the
