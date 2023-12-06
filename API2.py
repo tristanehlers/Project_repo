@@ -16,6 +16,26 @@ def extract_info(jsondata):
     }
     return extracted_info
 
+# Streamlit app layout
+st.set_page_config(layout="wide")  # Set the page to wide layout
+
+# Use columns to position the header and logo
+col1, col2 = st.columns([5, 1])  # Adjust the ratio as needed for your layout
+
+with col1:
+    st.title('LinkedIn Profile Filler')
+
+with col2:
+    linkedin_logo_url = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png'
+    st.image(linkedin_logo_url, width=50)
+
+# Input field for LinkedIn profile URL
+linkedin_profile_url = st.text_input('Enter your LinkedIn profile URL', 'https://www.linkedin.com/in/...')
+
+# Button to trigger the information retrieval
+if st.button('Retrieve Information'):
+    retrieve_info()
+
 # Function to fetch and display profile information
 def retrieve_info():
     params = {'linkedin_profile_url': linkedin_profile_url}
@@ -39,17 +59,3 @@ def display_info(info):
         st.write('Company:', exp.get('company', 'Not available'))
         st.write('Description:', exp.get('description', 'Not available'))
         st.write('---')  # Separator line
-
-# Streamlit app layout
-st.title('LinkedIn Profile Filler')
-
-# Display LinkedIn logo
-linkedin_logo_url = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png'
-st.image(linkedin_logo_url, width=50)
-
-# Input field for LinkedIn profile URL
-linkedin_profile_url = st.text_input('Enter your LinkedIn profile URL', 'https://www.linkedin.com/in/...')
-
-# Button to trigger the information retrieval
-if st.button('Retrieve Information'):
-    retrieve_info()
