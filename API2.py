@@ -3,7 +3,7 @@ import requests
 import json
 
 # Define your API key and headers
-api_key = '_EIqMpWEbOnJLoQvNFz1CQ'  # Be sure to replace with your actual API key
+api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Be sure to replace with your actual API key
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin'
 
