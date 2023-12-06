@@ -6,9 +6,6 @@ api_key = '_EIqMpWEbOnJLoQvNFz1CQ'  # Be sure to replace with your actual API ke
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin'
 
-# Streamlit app layout
-st.set_page_config(layout="wide")  # Set the page layout to wide
-
 # Create columns for the header and the LinkedIn logo
 header_col, logo_col = st.columns([0.9, 0.1])
 
