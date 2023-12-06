@@ -22,8 +22,11 @@ st.title('LinkedIn Profile Filler')
 # Input field for LinkedIn profile URL
 linkedin_profile_url = st.text_input('Enter your LinkedIn profile URL', 'https://www.linkedin.com/in/...')
 
-# Button to fetch profile information
+# Display the clickable image
 if st.button('Retrieve Information'):
+    retrieve_info()
+
+def retrieve_info():
     params = {'linkedin_profile_url': linkedin_profile_url}
     
     # Make a request to the API
@@ -46,3 +49,5 @@ if st.button('Retrieve Information'):
             st.write('---')  # Separator line
     else:
         st.error(f"Failed to retrieve profile information: HTTP {response.status_code}")
+
+# Load the image from the
