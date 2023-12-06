@@ -3,7 +3,7 @@ import requests
 import json
 
 # Define your API key and headers
-api_key = 'OQfhKnmj2k9bUHmlHH9Qbg'  # Be sure to replace with your actual API key
+api_key = '_EIqMpWEbOnJLoQvNFz1CQ'  # Be sure to replace with your actual API key
 headers = {'Authorization': 'Bearer ' + api_key}
 api_endpoint = 'https://nubela.co/proxycurl/api/v2/linkedin'
 
@@ -22,8 +22,11 @@ st.title('LinkedIn Profile Filler')
 # Input field for LinkedIn profile URL
 linkedin_profile_url = st.text_input('Enter your LinkedIn profile URL', 'https://www.linkedin.com/in/...')
 
-# Button to fetch profile information
+# Display the clickable image
 if st.button('Retrieve Information'):
+    retrieve_info()
+
+def retrieve_info():
     params = {'linkedin_profile_url': linkedin_profile_url}
     
     # Make a request to the API
@@ -46,3 +49,5 @@ if st.button('Retrieve Information'):
             st.write('---')  # Separator line
     else:
         st.error(f"Failed to retrieve profile information: HTTP {response.status_code}")
+
+# Load the image from the
