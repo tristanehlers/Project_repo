@@ -14,7 +14,7 @@ def extract_info(jsondata):
         'city': jsondata.get('city', 'Not available'),
         'experiences': jsondata.get('experiences', [])
     }
-    return extracted_infox
+    return extracted_info
 
 # Streamlit app layout
 st.title('LinkedIn Profile Filler')
